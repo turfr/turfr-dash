@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 export type DashboardView =
@@ -25,13 +27,14 @@ function getViewFromUrl(): DashboardView {
 }
 
 export function useDashboardNavigation() {
-
-    const [view, setView] = useState<DashboardView>(() => getViewFromUrl());
+    const [view, setView] = useState<DashboardView>("summary");
 
     useEffect(() => {
         const handlePopState = () => {
             setView(getViewFromUrl());
         };
+
+        setView(getViewFromUrl());
 
         window.addEventListener("popstate", handlePopState);
 
