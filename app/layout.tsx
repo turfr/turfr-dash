@@ -15,8 +15,8 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Turfr — Community Funds",
-  description: "Turfr community funds dashboard",
+    title: "Ulwe Footballers",
+    description: "Ulwe Footballers community dashboard",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
