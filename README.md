@@ -36,7 +36,6 @@ Where useful, derived values should remain traceable back to the recorded match 
 ## Scope
 
 The dashboard should prioritise:
-
 - clarity
 - transparency
 - low operational complexity
