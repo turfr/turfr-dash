@@ -6,6 +6,8 @@ import { loadDashboardData } from "@/lib/dashboard/data";
 import {getCurrentWeek, groupMatchesByWeek} from "@/lib/dashboard/grouping";
 import {Dashboard} from "@/app/components/Dashboard";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
     const data = await loadDashboardData();
     const weeks = groupMatchesByWeek(data.matches);
