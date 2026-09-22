@@ -2,7 +2,7 @@ import {
     calculateCurrentFund,
     calculateMatchCollection,
 } from "@/lib/dashboard/calculations";
-import { loadDashboardData } from "@/lib/dashboard/data";
+import {loadDashboardData} from "@/lib/dashboard/data";
 import {getCurrentWeek, groupMatchesByWeek} from "@/lib/dashboard/grouping";
 import {Dashboard} from "@/app/components/Dashboard";
 
@@ -46,8 +46,7 @@ export default async function Home() {
     }));
 
     return (
-        <main className="mx-auto min-h-dvh max-w-2xl px-4 pt-2 py-4 sm:px-6 sm:py-6">
-
+        <main className="mx-auto max-w-2xl px-4 pt-2 py-4 sm:px-6 sm:py-6">
             <Dashboard
                 currentFund={currentFund}
                 matchCollection={matchCollection}

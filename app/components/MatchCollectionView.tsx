@@ -85,8 +85,12 @@ export function MatchCollectionView({
                 <div className="mt-4 flex items-end justify-between">
                     <div>
                         <p className="text-2xl font-semibold tracking-tight">
-                            {week.matches.length}
+                            {week.matches.reduce(
+                                (sum, match) => sum + match.games,
+                                0,
+                            )}
                         </p>
+
                         <p className="text-xs text-neutral-500">
                             matches
                         </p>
@@ -96,6 +100,7 @@ export function MatchCollectionView({
                         <p className="text-2xl font-semibold tracking-tight">
                             ₹{collection.received.toLocaleString("en-IN")}
                         </p>
+
                         <p className="text-xs text-neutral-500">
                             Total
                         </p>
@@ -134,7 +139,6 @@ export function MatchCollectionView({
             <div className="divide-y divide-neutral-100">
                 {dailyRecords.map((day) => {
                     const formatted = formatDay(day.date);
-
                     const isToday = day.date === today;
                     const isFuture = day.date > today;
 
@@ -143,8 +147,12 @@ export function MatchCollectionView({
                         0,
                     );
 
-                    const hasGames = day.matches.length > 0;
-                    const hasMultipleGames = day.matches.length > 1;
+                    const gameCount = day.matches.reduce(
+                        (sum, match) => sum + match.games,
+                        0,
+                    );
+
+                    const hasGames = gameCount > 0;
 
                     const note = day.matches
                         .map((match) => match.note)
@@ -154,65 +162,65 @@ export function MatchCollectionView({
                     return (
                         <div
                             key={day.date}
-                            className={`h-16 px-5 ${
+                            className={`h-14 px-5 ${
                                 isFuture ? "text-neutral-300" : ""
                             }`}
                         >
-                            <div className="flex h-full items-center gap-3">
-
-                                {/* Date */}
-                                <span className="self-start pt-2 text-xs text-neutral-500">
+                            <div className="flex h-full flex-col">
+                                {/* Main line */}
+                                <div
+                                    className="grid h-8 items-center gap-3"
+                                    style={{
+                                        gridTemplateColumns: "40px 80px minmax(0, 1fr) auto",
+                                    }}
+                                >
+            <span className="text-xs text-neutral-500">
                 {formatted.day}
-                                    <sup className="ml-0.5 text-[9px]">
+                <sup className="ml-0.5 text-[9px]">
                     {getOrdinalSuffix(formatted.day)}
                 </sup>
             </span>
 
-                                {/* Day + secondary information */}
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-3">
-                    <span
-                        className={`text-xl font-semibold leading-none ${
-                            isFuture ? "text-neutral-300" : ""
-                        }`}
-                    >
-                        {formatted.weekday}
-                    </span>
+                                    <span
+                                        className={`text-xl font-semibold leading-none ${
+                                            isFuture ? "text-neutral-300" : ""
+                                        }`}
+                                    >
+                {formatted.weekday}
+            </span>
 
-                                        {hasMultipleGames && (
-                                            <span className="truncate text-xs text-neutral-500">
-                            {day.matches.length} games
-                        </span>
-                                        )}
+                                    <span className="min-w-0 truncate text-xs text-neutral-500">
+                {gameCount > 1 ? `${gameCount} games` : ""}
+            </span>
 
-                                        {!hasGames && !isFuture && !isToday && (
-                                            <span className="truncate text-sm italic text-neutral-500">
-                            No recorded games
-                        </span>
-                                        )}
-                                    </div>
+                                    {hasGames ? (
+                                        <span className="text-right text-lg font-medium">
+                    ₹{amount.toLocaleString("en-IN")}
+                </span>
+                                    ) : isToday ? (
+                                        <span className="text-right text-lg font-medium text-blue-600">
+                    Today
+                </span>
+                                    ) : isFuture ? (
+                                        <span className="text-right text-lg text-neutral-300">
+                    —
+                </span>
+                                    ) : (
+                                        <span />
+                                    )}
+                                </div>
 
+                                {/* Reserved note line */}
+                                <div
+                                    className="h-6"
+                                    style={{ paddingLeft: "52px" }}
+                                >
                                     {note && (
-                                        <p className="mt-1 truncate text-xs text-amber-600">
+                                        <p className="truncate text-xs text-amber-600">
                                             {note}
                                         </p>
                                     )}
                                 </div>
-
-                                {/* Amount / Today / Future */}
-                                {hasGames ? (
-                                    <span className="shrink-0 text-lg font-medium">
-                    ₹{amount.toLocaleString("en-IN")}
-                </span>
-                                ) : isToday ? (
-                                    <span className="shrink-0 text-lg font-medium text-blue-600">
-                    Today
-                </span>
-                                ) : isFuture ? (
-                                    <span className="shrink-0 text-lg text-neutral-300">
-                    —
-                </span>
-                                ) : null}
                             </div>
                         </div>
                     );

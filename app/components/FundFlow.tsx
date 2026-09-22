@@ -8,12 +8,14 @@ type FundFlowProps = {
     matchReceived: number;
     sponsorTotal: number;
     purchaseTotal: number;
+    onMatchCollectionClick: () => void;
 };
 
 export function FundFlow({
                              matchReceived,
                              sponsorTotal,
                              purchaseTotal,
+                             onMatchCollectionClick,
                          }: FundFlowProps) {
     const items: FundFlowItem[] = [
         {
@@ -99,15 +101,15 @@ export function FundFlow({
                                 gap: "6px",
                             }}
                         >
-                <span
-                    style={{
-                        width: "8px",
-                        height: "8px",
-                        flexShrink: 0,
-                        borderRadius: "50%",
-                        backgroundColor: item.color,
-                    }}
-                />
+                            <span
+                                style={{
+                                    width: "8px",
+                                    height: "8px",
+                                    flexShrink: 0,
+                                    borderRadius: "50%",
+                                    backgroundColor: item.color,
+                                }}
+                            />
 
                             <span
                                 style={{
@@ -115,8 +117,8 @@ export function FundFlow({
                                     color: "#737373",
                                 }}
                             >
-                    {item.label}
-                </span>
+                                {item.label}
+                            </span>
                         </div>
 
                         {/* Amount */}
@@ -126,45 +128,76 @@ export function FundFlow({
                                 alignItems: "baseline",
                             }}
                         >
-                <span
-                    style={{
-                        fontFamily: "var(--font-ibm-plex-mono)",
-                        fontSize: "14px",
-                        color: "#171717",
-                    }}
-                >
-                    ₹
-                </span>
-
-                            <a
-                                href="#"
+                            <span
                                 style={{
-                                    display: "inline-flex",
-                                    alignItems: "baseline",
-                                    fontFamily: "var(--font-jetbrains-mono)",
+                                    fontFamily: "var(--font-ibm-plex-mono)",
                                     fontSize: "14px",
-                                    fontWeight: 400,
-                                    lineHeight: "0.85",
                                     color: "#171717",
-                                    fontVariantNumeric: "tabular-nums",
-                                    textDecoration: "none",
                                 }}
                             >
-                                {item.amount.toLocaleString("en-IN")}
+                                ₹
+                            </span>
 
+                            {item.label === "Match Collection" ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={onMatchCollectionClick}
+                                        style={{
+                                            fontFamily: "var(--font-jetbrains-mono)",
+                                            fontSize: "14px",
+                                            fontWeight: 400,
+                                            lineHeight: "1",
+                                            color: "#171717",
+                                            fontVariantNumeric: "tabular-nums",
+                                            textDecoration: "underline",
+                                            textUnderlineOffset: "0 px",
+                                            textDecorationThickness: "1px",
+                                            cursor: "pointer",
+                                            background: "none",
+                                            border: "none",
+                                            padding: 0,
+                                        }}
+                                    >
+                                        {item.amount.toLocaleString("en-IN")}
+                                    </button>
+
+                                    <span
+                                        style={{
+                                            fontFamily: "var(--font-jetbrains-mono)",
+                                            fontSize: "9px",
+                                            lineHeight: "1",
+                                            color: "#a3a3a3",
+                                            fontVariantNumeric: "tabular-nums",
+                                            marginLeft: "1px",
+                                            letterSpacing: "-0.03em",
+                                        }}
+                                    >
+                                        .00
+                                    </span>
+                                </>
+                            ) : (
                                 <span
                                     style={{
-                                        fontSize: "9px",
-                                        lineHeight: "1",
-                                        color: "#a3a3a3",
+                                        fontFamily: "var(--font-jetbrains-mono)",
+                                        fontSize: "14px",
+                                        color: "#171717",
                                         fontVariantNumeric: "tabular-nums",
-                                        marginLeft: "1px",
-                                        letterSpacing: "-0.03em",
                                     }}
                                 >
-                        .00
-                    </span>
-                            </a>
+                                    {item.amount.toLocaleString("en-IN")}
+
+                                    <span
+                                        style={{
+                                            fontSize: "9px",
+                                            color: "#a3a3a3",
+                                            marginLeft: "1px",
+                                        }}
+                                    >
+                                        .00
+                                    </span>
+                                </span>
+                            )}
                         </div>
                     </div>
                 ))}
