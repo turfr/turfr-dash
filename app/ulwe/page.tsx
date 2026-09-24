@@ -1,14 +1,19 @@
-import {
-    calculateCurrentFund,
-    calculateMatchCollection,
-} from "@/lib/dashboard/calculations";
+import {calculateCurrentFund, calculateMatchCollection} from "@/lib/dashboard/calculations";
 import {loadDashboardData} from "@/lib/dashboard/data";
 import {getCurrentWeek, groupMatchesByWeek} from "@/lib/dashboard/grouping";
 import {Dashboard} from "@/app/components/Dashboard";
+import {getDashboardView} from "@/app/components/dashboardNavigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home({
+                                       searchParams,
+                                   } : { searchParams: Promise<{view? :string}>;
+                                }) {
+
+    const params = await searchParams;
+    const initialView = getDashboardView(params.view ?? null);
+
     const data = await loadDashboardData();
     const weeks = groupMatchesByWeek(data.matches);
 
@@ -48,6 +53,7 @@ export default async function Home() {
     return (
         <main className="mx-auto max-w-2xl px-4 pt-2 py-4 sm:px-6 sm:py-6">
             <Dashboard
+                initialView={initialView}
                 currentFund={currentFund}
                 matchCollection={matchCollection}
                 sponsorTotal={sponsorTotal}

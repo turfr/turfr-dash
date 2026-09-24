@@ -3,6 +3,7 @@
 import {useEffect, useState} from "react";
 import {FundSummary} from "./FundSummary";
 import {useDashboardNavigation} from "@/app/components/useDashboardNavigation";
+import {DashboardView} from "@/app/components/dashboardNavigation";
 import {MatchRecord} from "@/lib/types";
 import {MatchCollectionView} from "@/app/components/MatchCollectionView";
 import {MatchWeek} from "@/lib/dashboard/grouping";
@@ -44,6 +45,7 @@ function getOrdinalSuffix(day: number) {
 }
 
 type DashboardProps = {
+    initialView: DashboardView;
     currentFund: number;
     matchCollection: {
         expected: number;
@@ -63,6 +65,7 @@ type DashboardProps = {
 };
 
 export function Dashboard({
+                              initialView,
                               currentFund,
                               matchCollection,
                               sponsorTotal,
@@ -72,7 +75,7 @@ export function Dashboard({
                               today,
                           }: DashboardProps) {
 
-    const {view, navigate} = useDashboardNavigation();
+    const {view, navigate} = useDashboardNavigation(initialView);
     const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
     const selectedWeek = weeks[selectedWeekIndex];
 
