@@ -162,24 +162,7 @@ export function Dashboard({
     if (view !== "summary") {
 
         return (
-            // <div className="min-h-dvh">
             <div>
-                {/*<div className="flex items-center justify-between">*/}
-                {/*    <h1 className="text-2xl font-semibold tracking-tight">*/}
-                {/*            Match Collection*/}
-                {/*    </h1>*/}
-
-                {/*    {matchCollectionMode === "recent" && (*/}
-                {/*        <button*/}
-                {/*            type="button"*/}
-                {/*            aria-label="History"*/}
-                {/*            onClick={() => setMatchCollectionMode("history")}*/}
-                {/*            className="text-lg text-neutral-500"*/}
-                {/*        >*/}
-                {/*            ◷*/}
-                {/*        </button>*/}
-                {/*    )}*/}
-                {/*</div>*/}
                 {view === "matches" && selectedWeek && (
                     <>
                         {matchCollectionMode === "recent" && (
@@ -407,7 +390,6 @@ export function Dashboard({
     }
 
     return (
-        // <div className="h-dvh overflow-hidden">
         <div className="overflow-hidden">
 
         <header className="text-center">
@@ -445,37 +427,6 @@ export function Dashboard({
 
             <div className="mt-2 space-y-5">
                     <FundSummary amount={currentFund}/>
-
-                {/*<section className="mt-1">*/}
-
-                {/*    <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-none">*/}
-                {/*        <FundCard*/}
-                {/*            title="Match Collection"*/}
-                {/*            value={`₹${matchCollection.received.toLocaleString("en-IN")}`}*/}
-                {/*            subtitle={`₹${matchCollection.expected.toLocaleString("en-IN")} expected`}*/}
-                {/*            onClick={() => navigate("matches")}*/}
-                {/*        />*/}
-
-                {/*        <FundCard*/}
-                {/*            title="Sponsors"*/}
-                {/*            value={`₹${sponsorTotal.toLocaleString("en-IN")}`}*/}
-                {/*            onClick={() => navigate("sponsors")}*/}
-                {/*        />*/}
-
-                {/*        <FundCard*/}
-                {/*            title="Purchases"*/}
-                {/*            value={`₹${purchaseTotal.toLocaleString("en-IN")}`}*/}
-                {/*            onClick={() => navigate("purchases")}*/}
-                {/*        />*/}
-
-                {/*        <FundCard*/}
-                {/*            title="Donations"*/}
-                {/*            value={`${donationCount}`}*/}
-                {/*            subtitle="items"*/}
-                {/*            onClick={() => navigate("donations")}*/}
-                {/*        />*/}
-                {/*    </div>*/}
-                {/*</section>*/}
                 <div className="mt-4">
                     <FundFlow
                         matchReceived={matchCollection.received}
@@ -484,10 +435,6 @@ export function Dashboard({
                         onMatchCollectionClick={() => navigate("matches")}
                     />
                 </div>
-                {/* ACTIVITY */}
-                {/*<div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">*/}
-                {/*    <ActivityList activities={activities}/>*/}
-                {/*</div>*/}
                 <div className="mt-4 pb-1">
                     <MatchActivity
                         matches={matches}
