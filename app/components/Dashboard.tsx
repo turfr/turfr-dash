@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {useEffect, useState} from "react";
 import {FundSummary} from "./FundSummary";
 import {useDashboardNavigation} from "@/app/components/useDashboardNavigation";
@@ -396,12 +397,14 @@ export function Dashboard({
         <div className="overflow-hidden">
 
         <header className="text-center">
-                <img
-                    src="/turfr-logo.svg"
-                    alt="Turfr"
-                    className="mx-auto block"
-                    style={{ width: "100px", height: "auto" }}
-                />
+            <Image
+                src="/turfr-logo.svg"
+                alt="Turfr"
+                width={398}
+                height={126}
+                className="mx-auto block"
+                style={{width: "100px", height: "auto"}}
+            />
 
                 <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-neutral-500">
                     <svg
