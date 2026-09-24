@@ -1,30 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import {useEffect, useState} from "react";
-import {ActivityList} from "./ActivityList";
 import {FundSummary} from "./FundSummary";
-import {SummaryRow} from "./SummaryRow";
 import {useDashboardNavigation} from "@/app/components/useDashboardNavigation";
+import {DashboardView} from "@/app/components/dashboardNavigation";
 import {MatchRecord} from "@/lib/types";
 import {MatchCollectionView} from "@/app/components/MatchCollectionView";
 import {MatchWeek} from "@/lib/dashboard/grouping";
-import {FundCard} from "@/app/components/FundCard";
 import {FundFlow} from "@/app/components/FundFlow";
 import {MatchActivity} from "@/app/components/MatchActivity";
-
-// function formatDateRange(startDate: string, endDate: string) {
-//     const start = new Date(`${startDate}T00:00:00Z`);
-//     const end = new Date(`${endDate}T00:00:00Z`);
-//
-//     const format = (date: Date) =>
-//         date.toLocaleDateString("en-IN", {
-//             day: "numeric",
-//             month: "short",
-//             timeZone: "UTC",
-//         });
-//
-//     return `${format(start)} → ${format(end)}`;
-// }
 
 function formatDateRange(startDate: string, endDate: string) {
     const start = new Date(`${startDate}T00:00:00Z`);
@@ -61,6 +46,7 @@ function getOrdinalSuffix(day: number) {
 }
 
 type DashboardProps = {
+    initialView: DashboardView;
     currentFund: number;
     matchCollection: {
         expected: number;
@@ -80,18 +66,17 @@ type DashboardProps = {
 };
 
 export function Dashboard({
+                              initialView,
                               currentFund,
                               matchCollection,
                               sponsorTotal,
                               purchaseTotal,
-                              donationCount,
-                              activities,
                               matches,
                               weeks,
                               today,
                           }: DashboardProps) {
 
-    const {view, navigate} = useDashboardNavigation();
+    const {view, navigate} = useDashboardNavigation(initialView);
     const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
     const selectedWeek = weeks[selectedWeekIndex];
 
@@ -178,31 +163,10 @@ export function Dashboard({
         };
     }, [weeks.length]);
 
-    const firstRecordedDate = matches
-        .map((match) => match.date)
-        .sort()[0];
-
     if (view !== "summary") {
 
         return (
-            // <div className="min-h-dvh">
             <div>
-                {/*<div className="flex items-center justify-between">*/}
-                {/*    <h1 className="text-2xl font-semibold tracking-tight">*/}
-                {/*            Match Collection*/}
-                {/*    </h1>*/}
-
-                {/*    {matchCollectionMode === "recent" && (*/}
-                {/*        <button*/}
-                {/*            type="button"*/}
-                {/*            aria-label="History"*/}
-                {/*            onClick={() => setMatchCollectionMode("history")}*/}
-                {/*            className="text-lg text-neutral-500"*/}
-                {/*        >*/}
-                {/*            ◷*/}
-                {/*        </button>*/}
-                {/*    )}*/}
-                {/*</div>*/}
                 {view === "matches" && selectedWeek && (
                     <>
                         {matchCollectionMode === "recent" && (
@@ -430,16 +394,17 @@ export function Dashboard({
     }
 
     return (
-        // <div className="h-dvh overflow-hidden">
         <div className="overflow-hidden">
 
         <header className="text-center">
-                <img
-                    src="/turfr-logo.svg"
-                    alt="Turfr"
-                    className="mx-auto block"
-                    style={{ width: "100px", height: "auto" }}
-                />
+            <Image
+                src="/turfr-logo.svg"
+                alt="Turfr"
+                width={398}
+                height={126}
+                className="mx-auto block"
+                style={{width: "100px", height: "auto"}}
+            />
 
                 <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-neutral-500">
                     <svg
@@ -468,37 +433,6 @@ export function Dashboard({
 
             <div className="mt-2 space-y-5">
                     <FundSummary amount={currentFund}/>
-
-                {/*<section className="mt-1">*/}
-
-                {/*    <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-none">*/}
-                {/*        <FundCard*/}
-                {/*            title="Match Collection"*/}
-                {/*            value={`₹${matchCollection.received.toLocaleString("en-IN")}`}*/}
-                {/*            subtitle={`₹${matchCollection.expected.toLocaleString("en-IN")} expected`}*/}
-                {/*            onClick={() => navigate("matches")}*/}
-                {/*        />*/}
-
-                {/*        <FundCard*/}
-                {/*            title="Sponsors"*/}
-                {/*            value={`₹${sponsorTotal.toLocaleString("en-IN")}`}*/}
-                {/*            onClick={() => navigate("sponsors")}*/}
-                {/*        />*/}
-
-                {/*        <FundCard*/}
-                {/*            title="Purchases"*/}
-                {/*            value={`₹${purchaseTotal.toLocaleString("en-IN")}`}*/}
-                {/*            onClick={() => navigate("purchases")}*/}
-                {/*        />*/}
-
-                {/*        <FundCard*/}
-                {/*            title="Donations"*/}
-                {/*            value={`${donationCount}`}*/}
-                {/*            subtitle="items"*/}
-                {/*            onClick={() => navigate("donations")}*/}
-                {/*        />*/}
-                {/*    </div>*/}
-                {/*</section>*/}
                 <div className="mt-4">
                     <FundFlow
                         matchReceived={matchCollection.received}
@@ -507,10 +441,6 @@ export function Dashboard({
                         onMatchCollectionClick={() => navigate("matches")}
                     />
                 </div>
-                {/* ACTIVITY */}
-                {/*<div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">*/}
-                {/*    <ActivityList activities={activities}/>*/}
-                {/*</div>*/}
                 <div className="mt-4 pb-1">
                     <MatchActivity
                         matches={matches}

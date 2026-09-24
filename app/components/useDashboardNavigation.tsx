@@ -1,40 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
+import {DashboardView, getDashboardView} from "@/app/components/dashboardNavigation";
 
-export type DashboardView =
-    | "summary"
-    | "matches"
-    | "sponsors"
-    | "purchases"
-    | "donations";
 
 function getViewFromUrl(): DashboardView {
     const params = new URLSearchParams(window.location.search);
-    const view = params.get("view");
-
-
-    if (
-        view === "matches" ||
-        view === "sponsors" ||
-        view === "purchases" ||
-        view === "donations"
-    ) {
-        return view;
-    }
-
-    return "summary";
+    return getDashboardView(params.get("view"));
 }
 
-export function useDashboardNavigation() {
-    const [view, setView] = useState<DashboardView>("summary");
+export function useDashboardNavigation(initialView: DashboardView) {
+    const [view, setView] = useState<DashboardView>(initialView);
 
     useEffect(() => {
         const handlePopState = () => {
             setView(getViewFromUrl());
         };
-
-        setView(getViewFromUrl());
 
         window.addEventListener("popstate", handlePopState);
 
