@@ -1,30 +1,13 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import {ActivityList} from "./ActivityList";
 import {FundSummary} from "./FundSummary";
-import {SummaryRow} from "./SummaryRow";
 import {useDashboardNavigation} from "@/app/components/useDashboardNavigation";
 import {MatchRecord} from "@/lib/types";
 import {MatchCollectionView} from "@/app/components/MatchCollectionView";
 import {MatchWeek} from "@/lib/dashboard/grouping";
-import {FundCard} from "@/app/components/FundCard";
 import {FundFlow} from "@/app/components/FundFlow";
 import {MatchActivity} from "@/app/components/MatchActivity";
-
-// function formatDateRange(startDate: string, endDate: string) {
-//     const start = new Date(`${startDate}T00:00:00Z`);
-//     const end = new Date(`${endDate}T00:00:00Z`);
-//
-//     const format = (date: Date) =>
-//         date.toLocaleDateString("en-IN", {
-//             day: "numeric",
-//             month: "short",
-//             timeZone: "UTC",
-//         });
-//
-//     return `${format(start)} → ${format(end)}`;
-// }
 
 function formatDateRange(startDate: string, endDate: string) {
     const start = new Date(`${startDate}T00:00:00Z`);
@@ -84,8 +67,6 @@ export function Dashboard({
                               matchCollection,
                               sponsorTotal,
                               purchaseTotal,
-                              donationCount,
-                              activities,
                               matches,
                               weeks,
                               today,
@@ -177,10 +158,6 @@ export function Dashboard({
             window.removeEventListener("popstate", updateModeFromUrl);
         };
     }, [weeks.length]);
-
-    const firstRecordedDate = matches
-        .map((match) => match.date)
-        .sort()[0];
 
     if (view !== "summary") {
 
