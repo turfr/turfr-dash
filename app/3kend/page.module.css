@@ -1,0 +1,276 @@
+.screen {
+    --page-bg: #090a09;
+    --page-fg: #f2f3eb;
+    --muted: #777c74;
+    --line: #252923;
+    --clock-lit: #d6e5b1;
+    --clock-unlit: #141712;
+
+    min-height: 100vh;
+    min-height: 100svh;
+    width: 100%;
+    padding: max(18px, env(safe-area-inset-top)) 20px max(16px, env(safe-area-inset-bottom));
+    background: var(--page-bg);
+    color: var(--page-fg);
+    font-family: var(--font-ibm-plex-mono), monospace;
+    display: flex;
+    justify-content: center;
+}
+
+.frame {
+    width: min(100%, 440px);
+    min-height: calc(100svh - max(18px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: block;
+    width: 92px;
+    height: auto;
+}
+
+.previewState,
+.matchCount,
+.clockCaption,
+.masterClock,
+.progress {
+    font-size: 10px;
+    letter-spacing: 0.13em;
+}
+
+.previewState {
+    color: var(--muted);
+}
+
+.sessionSummary {
+    padding: 10px 0 0;
+}
+
+.match {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: clamp(12px, 2vh, 18px) 0 12px;
+}
+
+.matchCount {
+    margin: 0 0 clamp(16px, 4vh, 30px);
+    color: var(--page-fg);
+    font-weight: 600;
+}
+
+.matchCount span {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.teams {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 8vw, 38px);
+}
+
+.team {
+    min-width: 58px;
+    color: var(--team-color);
+    font-size: clamp(44px, 14vw, 66px);
+    line-height: 1;
+    font-weight: 600;
+    text-align: center;
+}
+
+.versus {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+}
+
+.clock {
+    width: 100%;
+    position: relative;
+    display: grid;
+    place-items: center;
+    margin-top: clamp(22px, 6vh, 42px);
+    color: var(--clock-lit);
+    font-family: "DSEG7 Classic", monospace;
+    font-size: clamp(58px, 19.5vw, 84px);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+@font-face {
+    font-family: "DSEG7 Classic";
+    src: url("/fonts/DSEG7Classic-Regular.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+.clockSegmentsOff,
+.clockValue {
+    grid-area: 1 / 1;
+}
+
+.clockSegmentsOff {
+    color: var(--clock-unlit);
+}
+
+.clockValue {
+    color: var(--clock-lit);
+}
+
+.clockCaption {
+    margin: 10px 0 0;
+    color: var(--muted);
+}
+
+.timekeeper {
+    min-height: 16px;
+    margin: clamp(22px, 5vh, 34px) 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+}
+
+.timekeeper strong {
+    font-weight: 600;
+    color: var(--page-fg);
+}
+
+.timekeeperDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--clock-lit);
+}
+
+.control {
+    width: 100%;
+    min-height: 52px;
+    border: 1px solid #3a4037;
+    border-radius: 2px;
+    background: transparent;
+    color: #656b61;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+}
+
+.control:disabled {
+    cursor: not-allowed;
+}
+
+.actionArea {
+    width: 100%;
+    margin-top: clamp(14px, 2.5vh, 20px);
+}
+
+.masterClock {
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+}
+
+.masterClock strong {
+    color: var(--page-fg);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+}
+
+.notStarted {
+    margin-left: auto;
+    font-size: 9px;
+}
+
+.progress {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 5px;
+    margin: 9px 0 0;
+    padding: 0;
+    list-style: none;
+    color: #676c64;
+    text-align: center;
+    letter-spacing: 0;
+}
+
+.progress li {
+    padding: 7px 0 3px;
+    border-top: 2px solid var(--line);
+}
+
+.currentMatch {
+    border-color: var(--clock-lit) !important;
+    color: var(--clock-lit);
+}
+
+.upcomingMatch {
+    color: #676c64;
+}
+
+.brandFooter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: auto;
+    padding: 8px 0 max(18px, env(safe-area-inset-bottom));
+    color: #a0a59d;
+    font-family: var(--font-jetbrains-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+}
+
+.poweredLogo {
+    display: block;
+    width: 70px;
+    height: auto;
+}
+
+@media (max-height: 700px) {
+    .matchCount {
+        margin-bottom: 12px;
+    }
+
+    .clock {
+        margin-top: 16px;
+    }
+
+    .timekeeper {
+        margin-top: 16px;
+    }
+
+    .sessionSummary {
+        padding-top: 4px;
+    }
+
+    .control {
+        min-height: 44px;
+    }
+
+    .brandFooter {
+        padding-top: 5px;
+    }
+}
