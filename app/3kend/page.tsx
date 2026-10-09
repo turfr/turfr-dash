@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { generateClassicRotation, type RotationTeam } from "@/lib/3kend/classic-rotation";
 import { SevenSegmentClock } from "./SevenSegmentClock";
+import { TeamKitIcon } from "./TeamKitIcon";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -11,11 +11,13 @@ export const metadata: Metadata = {
 };
 
 // Preview colors only; replace these with the teams' assigned colors when configured.
+type PreviewTeam = RotationTeam & { kitType: "jersey" | "bibs"; bibCode: string };
+
 const teams = [
-    { id: "team-a", label: "A", color: "#ff594f" },
-    { id: "team-b", label: "B", color: "#6baeff" },
-    { id: "team-c", label: "C", color: "#c5e86c" },
-] as const satisfies readonly [RotationTeam, RotationTeam, RotationTeam];
+    { id: "A", label: "A", color: "#777b80", kitType: "bibs", bibCode: "Black" },
+    { id: "B", label: "B", color: "#f2f3eb", kitType: "jersey", bibCode: "White" },
+    { id: "C", label: "C", color: "#ff8538", kitType: "bibs", bibCode: "Orange" },
+] as const satisfies readonly [PreviewTeam, PreviewTeam, PreviewTeam];
 
 const fixtures = generateClassicRotation(teams);
 const previewFixture = fixtures[0];
@@ -61,13 +63,11 @@ export default function ThreeKendPage() {
                     <p className={styles.matchCount}>MATCH 01 <span>/ 12</span></p>
 
                     <div className={styles.teams}>
-                        <span className={styles.team} style={{ "--team-color": previewFixture.home.color } as CSSProperties}>
-                            {previewFixture.home.label}
-                        </span>
+                        <TeamKitIcon teamKey={previewFixture.home.id} label={previewFixture.home.label}
+                            color={previewFixture.home.color} kitType={previewFixture.home.kitType} bibCode={previewFixture.home.bibCode} />
                         <span className={styles.versus}>VS</span>
-                        <span className={styles.team} style={{ "--team-color": previewFixture.away.color } as CSSProperties}>
-                            {previewFixture.away.label}
-                        </span>
+                        <TeamKitIcon teamKey={previewFixture.away.id} label={previewFixture.away.label}
+                            color={previewFixture.away.color} kitType={previewFixture.away.kitType} bibCode={previewFixture.away.bibCode} />
                     </div>
 
                     <SevenSegmentClock value="09:00" label="Nine minutes remaining" />
