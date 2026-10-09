@@ -79,16 +79,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(18px, 8vw, 38px);
+    gap: clamp(22px, 9vw, 40px);
 }
 
-.team {
-    min-width: 58px;
-    color: var(--team-color);
-    font-size: clamp(44px, 14vw, 66px);
-    line-height: 1;
-    font-weight: 600;
-    text-align: center;
+.teamKitIcon {
+    display: block;
+    width: clamp(48px, 14vw, 58px);
+    height: auto;
+    flex: 0 0 auto;
 }
 
 .versus {
@@ -178,6 +176,37 @@
     cursor: not-allowed;
 }
 
+.connectionNotice {
+    width: 100%;
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.offlineText {
+    color: #ed8175;
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+}
+
+.offlineText strong,
+.offlineText span {
+    display: block;
+}
+
+.offlineText strong {
+    font-weight: 600;
+}
+
+.offlineText span {
+    font-size: 8px;
+    letter-spacing: 0.07em;
+}
+
 .actionArea {
     width: 100%;
     margin-top: clamp(14px, 2.5vh, 20px);
@@ -227,6 +256,26 @@
 
 .upcomingMatch {
     color: #676c64;
+}
+
+.completedMatch {
+    border-color: #67715a !important;
+    color: #aab89b;
+}
+
+.readOnly,
+.statusMessage {
+    margin: 0;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-align: center;
+}
+
+.statusMessage {
+    margin-top: 9px;
+    color: var(--clock-lit);
+    letter-spacing: 0.04em;
 }
 
 .brandFooter {
