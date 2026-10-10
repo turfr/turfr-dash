@@ -5,7 +5,7 @@
     padding: max(18px, env(safe-area-inset-top)) 20px max(16px, env(safe-area-inset-bottom));
     background: #090a09;
     color: #f2f3eb;
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-ibm-plex-sans), sans-serif;
     display: flex;
     justify-content: center;
 }
@@ -37,6 +37,7 @@
 .shareBlock > span,
 .statusLine {
     color: #8b9187;
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 10px;
     letter-spacing: 0.1em;
     text-decoration: none;
@@ -139,32 +140,83 @@
 
 .teamRow {
     display: grid;
-    grid-template-columns: 24px repeat(3, minmax(0, 1fr)) 58px;
-    align-items: end;
+    grid-template-columns: 64px repeat(2, minmax(0, 1fr));
+    align-items: center;
     gap: 8px;
     padding: 12px 0;
     border-bottom: 1px solid #252923;
 }
 
-.teamRow > strong,
-.inviteRow h2 {
+.teamPreview {
+    grid-row: span 2;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    align-self: stretch;
     color: var(--team-color);
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
 }
 
-.teamRow > strong {
-    padding-bottom: 12px;
-    font-size: 18px;
+.teamRow .teamPreviewKit {
+    justify-self: center;
+}
+
+.inviteRow h2 {
+    color: var(--team-color);
 }
 
 .kitField select {
     appearance: auto;
 }
 
-.colorField input {
-    width: 48px;
+.colorField {
+    min-width: 0;
+}
+
+.colorControls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.colorControls select {
+    min-width: 0;
+}
+
+.colorField input[type="color"] {
+    width: 42px;
+    min-width: 42px;
     height: 42px;
+    padding: 3px;
     border: 1px solid #343a32;
     background: #0d0f0d;
+}
+
+.transparencyField span {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.transparencyField output {
+    color: #d6e5b1;
+    font-variant-numeric: tabular-nums;
+}
+
+.rangeInput {
+    width: 100%;
+    min-height: 42px;
+    margin: 0;
+    accent-color: #d6e5b1;
+    cursor: pointer;
+}
+
+.rangeInput:focus-visible {
+    outline: 2px solid #d6e5b1;
+    outline-offset: 2px;
 }
 
 .inviteRow {
@@ -202,6 +254,7 @@
 .shareBlock code {
     overflow-wrap: anywhere;
     color: #f2f3eb;
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 11px;
 }
 
@@ -211,7 +264,7 @@
     border: 0;
     background: transparent;
     color: #b4bcaa;
-    font: inherit;
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 10px;
     letter-spacing: 0.08em;
     cursor: pointer;
@@ -241,7 +294,7 @@
     margin-top: auto;
     padding: 16px 0 max(18px, env(safe-area-inset-bottom));
     color: #a0a59d;
-    font-family: var(--font-jetbrains-mono), monospace;
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 10px;
     letter-spacing: 0.1em;
 }
@@ -257,17 +310,13 @@
     }
 
     .teamRow {
-        grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: 54px minmax(0, 1fr) minmax(0, 1fr);
     }
 
-    .kitField {
-        grid-column: 2 / 4;
+    .teamRow .field,
+    .teamRow .colorField {
+        min-width: 0;
     }
 
-    .colorField {
-        grid-column: 2 / 4;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+    .teamRow .input { padding-right: 7px; padding-left: 7px; }
 }

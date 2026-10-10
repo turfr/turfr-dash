@@ -11,7 +11,7 @@ import {
     validateSameOrigin,
 } from "@/lib/3kend/server";
 
-const ALLOWED_ACTIONS = ["start", "pause", "resume", "finish", "admin_advance", "cancel"] as const;
+const ALLOWED_ACTIONS = ["start", "pause", "pause_injury", "pause_normal", "resume", "finish", "admin_advance", "finish_session", "cancel"] as const;
 type MatchAction = (typeof ALLOWED_ACTIONS)[number];
 
 export async function POST(request: Request, context: { params: Promise<{ code: string }> }) {
@@ -52,10 +52,7 @@ export async function POST(request: Request, context: { params: Promise<{ code: 
             throw error;
         }
 
-        const result = data as { ok?: boolean; reason?: string; status?: string } | null;
-        if (result?.ok === false && result.reason === "hard_end") {
-            return noStoreJson({ ok: false, status: "completed", reason: "hard_end" }, { status: 409 });
-        }
+        const result = data as { ok?: boolean; status?: string } | null;
         return noStoreJson({ ok: true, action: body.action, status: result?.status ?? null });
     } catch {
         return errorResponse("Could not apply the match action. Check the 3Kend migration and server configuration.", 503);

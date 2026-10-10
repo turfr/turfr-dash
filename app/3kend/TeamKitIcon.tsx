@@ -1,4 +1,6 @@
+import type { CSSProperties } from "react";
 import styles from "./page.module.css";
+import { getKitLabelColor } from "@/lib/3kend/kit-colors";
 
 type TeamKitIconProps = {
     teamKey: string;
@@ -6,57 +8,36 @@ type TeamKitIconProps = {
     color: string;
     kitType: "jersey" | "bibs";
     bibCode?: string;
+    opacity?: number;
+    size?: number;
+    className?: string;
 };
 
-export function TeamKitIcon({ teamKey, label, color, kitType, bibCode }: TeamKitIconProps) {
+export function TeamKitIcon({ teamKey, label, color, kitType, bibCode, opacity = 1, size, className }: TeamKitIconProps) {
     const kitName = kitType === "bibs" ? "bibs" : "jersey";
     const description = [`Team ${teamKey}`, label, bibCode, kitName].filter(Boolean).join(", ");
-    const letterColor = getLetterColor(color);
+    const asset = kitType === "bibs" ? "/3kend/bibs.svg" : "/3kend/jersey.svg";
+    const aspectRatio = kitType === "bibs" ? "357 / 443" : "429 / 445";
+    const widthRatio = kitType === "bibs" ? 357 / 443 : 429 / 445;
+    const shapeClass = kitType === "bibs" ? styles.teamKitBibs : styles.teamKitJersey;
 
     return (
-        <svg
-            className={styles.teamKitIcon}
-            viewBox="0 0 48 48"
+        <span
+            className={[styles.teamKitIcon, shapeClass, className].filter(Boolean).join(" ")}
             role="img"
             aria-label={description}
-            xmlns="http://www.w3.org/2000/svg"
+            style={{
+                "--kit-color": color,
+                "--kit-label-color": getKitLabelColor(color),
+                "--kit-asset": `url("${asset}")`,
+                "--kit-aspect-ratio": aspectRatio,
+                "--kit-opacity": Math.max(0, Math.min(1, opacity)),
+                "--kit-label-size": `${Math.max(8, Math.min(16, 52 / Math.max(1, label.length)))}px`,
+                ...(size ? { width: `${size * widthRatio}px`, height: `${size}px` } : {}),
+            } as CSSProperties}
         >
-            {kitType === "bibs" ? (
-                <>
-                    <path d="M14 5h7l3 5 3-5h7l8 8-5 6-5-3v25H16V16l-5 3-5-6 8-8Z" fill={color} />
-                    <path d="M21 5c0 4 6 4 6 0" fill="none" stroke="#090a09" strokeOpacity=".38" strokeWidth="1.6" />
-                </>
-            ) : (
-                <>
-                    <path d="M14 5h6c.7 4 7.3 4 8 0h6l8 7-4 8-6-3v22H16V17l-6 3-4-8 8-7Z" fill={color} />
-                    <path d="M20 5c.7 4 7.3 4 8 0" fill="none" stroke="#090a09" strokeOpacity=".38" strokeWidth="1.6" />
-                </>
-            )}
-            <text
-                x="24"
-                y="29"
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={letterColor}
-                fontFamily="Arial, sans-serif"
-                fontSize="16"
-                fontWeight="700"
-            >
-                {teamKey}
-            </text>
-        </svg>
+            <span className={styles.teamKitShape} aria-hidden="true" />
+            <span className={styles.teamKitLetter} aria-hidden="true">{label || teamKey}</span>
+        </span>
     );
 }
-
-function getLetterColor(color: string): string {
-    const channels = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color);
-    if (!channels) return "#090a09";
-
-    const linear = (channel: string) => {
-        const value = Number.parseInt(channel, 16) / 255;
-        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-    };
-    const luminance = 0.2126 * linear(channels[1]) + 0.7152 * linear(channels[2]) + 0.0722 * linear(channels[3]);
-    return luminance > 0.179 ? "#090a09" : "#f2f3eb";
-}
-

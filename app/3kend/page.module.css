@@ -5,6 +5,13 @@
     --line: #252923;
     --clock-lit: #d6e5b1;
     --clock-unlit: #141712;
+    --clock-stopped: #8794a0;
+    --clock-stopped-unlit: #171c20;
+    --state-danger: #e27467;
+    --state-warning: #c8aa69;
+    --control-bg: #11140f;
+    --control-border: #46503d;
+    --control-fg: #b9c3a4;
 
     min-height: 100vh;
     min-height: 100svh;
@@ -12,7 +19,10 @@
     padding: max(18px, env(safe-area-inset-top)) 20px max(16px, env(safe-area-inset-bottom));
     background: var(--page-bg);
     color: var(--page-fg);
-    font-family: var(--font-ibm-plex-mono), monospace;
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
     display: flex;
     justify-content: center;
 }
@@ -24,11 +34,50 @@
     flex-direction: column;
 }
 
+.loadingScreen {
+    overflow: hidden;
+    background-color: #070907;
+    background-image:
+        linear-gradient(180deg, rgb(4 5 5 / 55%) 0%, rgb(4 5 5 / 28%) 36%, rgb(4 5 5 / 12%) 66%, rgb(4 5 5 / 30%) 100%),
+        url("/3kend/loading-pitch.png");
+    background-position: center, 64% center;
+    background-size: cover;
+}
+
+.loadingFrame {
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-top: clamp(10px, 3vh, 24px);
+}
+
+.loadingLogo {
+    width: 110px;
+    height: auto;
+}
+
+.loadingText {
+    margin: 7px 0 0 10px;
+    color: #f2f3eb;
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    text-shadow: 0 1px 12px rgb(0 0 0 / 55%);
+}
+
 .header {
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.headerMeta {
+    min-width: 78px;
+    display: grid;
+    justify-items: end;
+    gap: 3px;
 }
 
 .logo {
@@ -39,9 +88,9 @@
 
 .previewState,
 .matchCount,
-.clockCaption,
 .masterClock,
 .progress {
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 10px;
     letter-spacing: 0.13em;
 }
@@ -83,10 +132,51 @@
 }
 
 .teamKitIcon {
+    position: relative;
     display: block;
-    width: clamp(48px, 14vw, 58px);
-    height: auto;
+    height: clamp(48px, 14vw, 58px);
     flex: 0 0 auto;
+    color: var(--kit-color);
+}
+
+.teamKitJersey {
+    width: clamp(46.3px, 13.5vw, 55.9px);
+}
+
+.teamKitBibs {
+    width: clamp(38.8px, 11.3vw, 46.7px);
+}
+
+.teamKitShape {
+    position: absolute;
+    inset: 0;
+    background: var(--kit-color);
+    opacity: var(--kit-opacity, 1);
+    -webkit-mask-image: var(--kit-asset);
+    mask-image: var(--kit-asset);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    mask-mode: alpha;
+}
+
+.teamKitLetter {
+    position: absolute;
+    left: 50%;
+    top: 56%;
+    max-width: 72%;
+    overflow: hidden;
+    transform: translate(-50%, -50%);
+    color: var(--kit-label-color);
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    font-size: var(--kit-label-size, clamp(12px, 3.5vw, 16px));
+    font-weight: 700;
+    line-height: 1;
+    text-overflow: clip;
+    white-space: nowrap;
 }
 
 .versus {
@@ -99,10 +189,11 @@
     width: 100%;
     position: relative;
     display: grid;
-    place-items: center;
-    margin-top: clamp(22px, 6vh, 42px);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    margin-top: clamp(8px, 2.5vh, 18px);
     color: var(--clock-lit);
-    font-family: "DSEG7 Classic", monospace;
+    font-family: var(--font-dseg7-classic);
     font-size: clamp(58px, 19.5vw, 84px);
     font-weight: 400;
     font-variant-numeric: tabular-nums;
@@ -110,17 +201,31 @@
     white-space: nowrap;
 }
 
-@font-face {
-    font-family: "DSEG7 Classic";
-    src: url("/fonts/DSEG7Classic-Regular.woff2") format("woff2");
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
+.clockCompact {
+    width: min(100%, 180px);
+    margin: 0;
+    font-size: clamp(26px, 8vw, 34px);
+}
+
+.clockStoppage .clockValue {
+    color: var(--state-danger);
+}
+
+.clockStoppage .clockSegmentsOff {
+    color: #251714;
 }
 
 .clockSegmentsOff,
 .clockValue {
     grid-area: 1 / 1;
+}
+
+.clockDigits {
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    min-width: max-content;
+    line-height: 1;
 }
 
 .clockSegmentsOff {
@@ -131,85 +236,423 @@
     color: var(--clock-lit);
 }
 
-.clockCaption {
-    margin: 10px 0 0;
+.clockOvertime .clockValue {
+    color: var(--state-danger);
+}
+
+.overtimeIndicator {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    color: var(--state-danger);
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    font-size: 0.28em;
+    font-weight: 500;
+    visibility: hidden;
+}
+
+.clockOvertime .overtimeIndicator {
+    visibility: visible;
+}
+
+.clockStopped .clockValue,
+.clockStopped .overtimeIndicator {
+    color: var(--clock-stopped);
+}
+
+.clockStopped .clockSegmentsOff {
+    color: var(--clock-stopped-unlit);
+}
+
+.clockStatusRegion {
+    width: 100%;
+    min-height: 68px;
+    margin-top: 8px;
+    display: grid;
+    grid-template-rows: 13px 36px 13px;
+    justify-items: center;
+    align-items: center;
+    row-gap: 2px;
+}
+
+.clockStateLabel {
+    margin: 0;
     color: var(--muted);
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+    line-height: 1;
+}
+
+.clockStateStopped {
+    color: var(--state-danger);
+    font-weight: 600;
+}
+
+.clockStateOvertime {
+    color: var(--state-danger);
+    font-weight: 600;
+}
+
+.stoppageClockSlot {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clockStatusMessage {
+    width: 100%;
+    height: 13px;
+    overflow: hidden;
+    margin: 0;
+    color: #777c74;
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    line-height: 13px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.clockStatusAlert {
+    color: var(--state-danger);
+}
+
+.timekeeperRegion {
+    width: 100%;
+    min-height: 32px;
+    margin: clamp(22px, 5vh, 34px) 0 0;
+    display: grid;
+    grid-template-rows: 16px 12px;
+    justify-items: center;
+    row-gap: 2px;
 }
 
 .timekeeper {
+    width: 100%;
     min-height: 16px;
-    margin: clamp(22px, 5vh, 34px) 0 0;
+    margin: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     color: var(--muted);
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 10px;
     letter-spacing: 0.08em;
 }
 
-.timekeeper strong {
-    font-weight: 600;
-    color: var(--page-fg);
+.timekeeperLabel {
+    min-width: 0;
+    max-width: calc(100% - 15px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.timekeeperDot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--clock-lit);
+.timekeeperLabel strong {
+    color: var(--page-fg);
+    font-weight: 600;
+}
+
+.timekeeperIcon {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    display: inline-grid;
+    place-items: center;
+    color: var(--clock-lit);
+}
+
+.timekeeperContext {
+    height: 12px;
+    margin: 0;
+    color: #82877d;
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-size: 8px;
+    letter-spacing: 0.09em;
+    line-height: 12px;
 }
 
 .control {
     width: 100%;
-    min-height: 52px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid #3a4037;
-    border-radius: 2px;
+    border-radius: 10px;
     background: transparent;
     color: #656b61;
-    font: inherit;
-    font-size: 11px;
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.1em;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 100ms ease;
+}
+
+.control:not(:disabled) {
+    border-color: var(--control-border);
+    background: var(--control-bg);
+    color: var(--control-fg);
+    cursor: pointer;
+}
+
+.controlResume:disabled {
+    border-color: #30372c;
+    background-color: #0d100c;
+    color: #737a6d;
+    opacity: 0.72;
+    cursor: not-allowed;
+}
+
+.controlPending {
+    border-color: var(--control-border);
+    background: var(--control-bg);
+    color: var(--control-fg);
+    opacity: 0.72;
+}
+
+.controlPending:disabled {
+    cursor: wait;
+}
+
+.controlSplit {
+    width: 100%;
+    min-height: 56px;
+    display: flex;
+    gap: 8px;
+    color: var(--control-fg);
+}
+
+.controlIcon {
+    min-width: 0;
+    flex: 1;
+    min-height: 52px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
+    background: var(--control-bg);
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 100ms ease;
+}
+
+.controlIconMedical {
+    border-color: #493632;
+    background: #17110f;
+    color: #df8278;
+}
+
+.controlIconStoppage {
+    border-color: #34414a;
+    background: #101519;
+    color: #8eb3cc;
+}
+
+.controlIcon:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.controlIcon:not(:disabled):hover,
+.control:not(:disabled):hover {
+    border-color: #68745a;
+}
+
+.controlIconMedical:not(:disabled):hover {
+    border-color: #76514b;
+    background: #1c1412;
+}
+
+.controlIconStoppage:not(:disabled):hover {
+    border-color: #4a6270;
+    background: #141c21;
+}
+
+.controlIcon:not(:disabled):active,
+.control:not(:disabled):active {
+    transform: translateY(1px);
+}
+
+.controlUnavailable {
+    opacity: 0.45;
+}
+
+.controlSplit:focus-within {
+    outline: 2px solid var(--page-fg);
+    outline-offset: 3px;
+}
+
+.control:focus-visible {
+    outline: 2px solid var(--page-fg);
+    outline-offset: 3px;
 }
 
 .control:disabled {
     cursor: not-allowed;
 }
 
-.connectionNotice {
-    width: 100%;
-    margin: 10px 0 0;
-    color: var(--muted);
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    line-height: 1.45;
-    text-align: center;
-}
-
-.offlineText {
-    color: #ed8175;
-    display: grid;
-    justify-items: center;
-    gap: 3px;
-}
-
-.offlineText strong,
-.offlineText span {
-    display: block;
-}
-
-.offlineText strong {
-    font-weight: 600;
-}
-
-.offlineText span {
+.connectivityStatus {
+    min-height: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 8px;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.1em;
+    line-height: 1;
+}
+
+.clockConnectivity {
+    width: 100%;
+    height: 11px;
+    margin-top: clamp(8px, 2vh, 14px);
+    display: flex;
+    justify-content: center;
+}
+
+.connectivityDot {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.connectivityOnline {
+    color: #819477;
+}
+
+.connectivityPending {
+    color: var(--state-warning);
+}
+
+.connectivityOffline {
+    color: var(--state-danger);
 }
 
 .actionArea {
     width: 100%;
     margin-top: clamp(14px, 2.5vh, 20px);
+}
+
+.finishSession {
+    display: block;
+    min-height: 36px;
+    margin: 8px auto 0;
+    padding: 0 12px;
+    border: 1px solid #49312f;
+    border-radius: 8px;
+    background: transparent;
+    color: #d28a80;
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 100ms ease;
+}
+
+.finishSession:not(:disabled):hover {
+    border-color: #76514b;
+    background: #17110f;
+}
+
+.finishSession:not(:disabled):active {
+    transform: translateY(1px);
+}
+
+.finishSession:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.finishSession:focus-visible {
+    outline: 2px solid var(--page-fg);
+    outline-offset: 3px;
+}
+
+.finishDialog {
+    width: min(calc(100% - 32px), 380px);
+    margin: auto;
+    padding: 0;
+    border: 1px solid #3a4037;
+    border-radius: 8px;
+    background: #0d0f0d;
+    color: var(--page-fg);
+}
+
+.finishDialog::backdrop {
+    background: rgb(0 0 0 / 72%);
+}
+
+.finishDialogContent {
+    padding: 22px;
+}
+
+.finishDialogEyebrow {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+}
+
+.finishDialog h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.finishDialogContent > p:not(.finishDialogEyebrow) {
+    margin: 10px 0 22px;
+    color: #a3a89e;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.finishDialogActions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.finishDialogCancel,
+.finishDialogConfirm {
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.finishDialogCancel {
+    background: transparent;
+    color: var(--page-fg);
+}
+
+.finishDialogConfirm {
+    border-color: var(--state-danger);
+    background: var(--state-danger);
+    color: #111;
+}
+
+.finishDialogCancel:focus-visible,
+.finishDialogConfirm:focus-visible {
+    outline: 2px solid var(--page-fg);
+    outline-offset: 3px;
+}
+
+.finishDialogConfirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .masterClock {
@@ -227,9 +670,27 @@
     letter-spacing: 0.08em;
 }
 
-.notStarted {
-    margin-left: auto;
-    font-size: 9px;
+.masterClock .masterClockValue {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    color: var(--clock-lit);
+    font-family: var(--font-dseg7-classic);
+    font-size: clamp(16px, 4.5vw, 20px);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+.masterClock .masterClockValueOvertime {
+    color: var(--state-danger);
+}
+
+.masterOvertimeSign {
+    color: var(--state-danger);
+    font-family: var(--font-ibm-plex-sans), sans-serif;
+    font-size: 0.8em;
+    font-weight: 500;
 }
 
 .progress {
@@ -263,39 +724,34 @@
     color: #aab89b;
 }
 
-.readOnly,
-.statusMessage {
+.readOnly {
     margin: 0;
     color: var(--muted);
+    font-family: var(--font-ibm-plex-mono), monospace;
     font-size: 10px;
     letter-spacing: 0.12em;
     text-align: center;
-}
-
-.statusMessage {
-    margin-top: 9px;
-    color: var(--clock-lit);
-    letter-spacing: 0.04em;
 }
 
 .brandFooter {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     margin-top: auto;
     padding: 8px 0 max(18px, env(safe-area-inset-bottom));
-    color: #a0a59d;
-    font-family: var(--font-jetbrains-mono), monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
+    color: #777c74;
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
     line-height: 1.2;
 }
 
 .poweredLogo {
     display: block;
-    width: 70px;
+    width: 64px;
     height: auto;
+    opacity: 0.62;
 }
 
 @media (max-height: 700px) {
@@ -307,8 +763,16 @@
         margin-top: 16px;
     }
 
+    .clockStatusRegion {
+        margin-top: 6px;
+    }
+
     .timekeeper {
-        margin-top: 16px;
+        margin-top: 0;
+    }
+
+    .timekeeperRegion {
+        margin-top: 14px;
     }
 
     .sessionSummary {
@@ -316,6 +780,11 @@
     }
 
     .control {
+        min-height: 44px;
+    }
+
+    .controlSplit,
+    .controlIcon {
         min-height: 44px;
     }
 

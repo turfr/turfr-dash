@@ -14,6 +14,7 @@ type TeamInput = {
     bibCode: string;
     colorHex: string;
     kitType?: "jersey" | "bibs";
+    kitOpacity?: number;
 };
 
 type CreateSessionBody = {
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
         typeof team.label === "string" && team.label.trim().length > 0 && team.label.trim().length <= 40 &&
         typeof team.bibCode === "string" && team.bibCode.trim().length > 0 && team.bibCode.trim().length <= 40 &&
         (team.kitType === undefined || team.kitType === "jersey" || team.kitType === "bibs") &&
+        (team.kitOpacity === undefined || (typeof team.kitOpacity === "number" && Number.isFinite(team.kitOpacity) && team.kitOpacity >= 0.4 && team.kitOpacity <= 1)) &&
         typeof team.colorHex === "string" && /^#[0-9A-Fa-f]{6}$/.test(team.colorHex),
     );
     if (!validTeams) return errorResponse("Enter teams A, B, and C with a kit style, bib color, and valid color value.", 400);
@@ -92,6 +94,7 @@ export async function POST(request: Request) {
             bib_code: team.bibCode.trim(),
             color_hex: team.colorHex,
             kit_type: team.kitType ?? "bibs",
+            kit_opacity: team.kitType === "bibs" ? team.kitOpacity ?? 1 : 1,
         }));
 
         let sessionId: string | null = null;

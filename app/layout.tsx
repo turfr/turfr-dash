@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { IBM_Plex_Mono, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
+
+const ibmPlexSans = IBM_Plex_Sans({
+    variable: "--font-ibm-plex-sans",
+    subsets: ["latin"],
+    weight: ["400", "500", "600"],
+});
 
 const ibmPlexMono = IBM_Plex_Mono({
     variable: "--font-ibm-plex-mono",
@@ -23,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
       <html lang="en">
       <body
-          className={`min-h-full ${ibmPlexMono.variable} ${jetBrainsMono.variable}`}
+          className={`min-h-full ${ibmPlexSans.variable} ${ibmPlexMono.variable} ${jetBrainsMono.variable}`}
       >
       {children}
       </body>

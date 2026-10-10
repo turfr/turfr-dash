@@ -16,6 +16,7 @@ type SessionRow = {
     clock_run_started_at: string | null;
     started_at: string | null;
     hard_ends_at: string | null;
+    updated_at: string;
     version: number;
 };
 
@@ -25,6 +26,7 @@ type TeamRow = {
     bib_code: string;
     color_hex: string;
     kit_type: "jersey" | "bibs";
+    kit_opacity: number;
 };
 
 export async function GET(_request: Request, context: { params: Promise<{ code: string }> }) {
@@ -36,7 +38,7 @@ export async function GET(_request: Request, context: { params: Promise<{ code: 
         const supabase = getSupabaseAdmin();
         const { data: sessionData, error: sessionError } = await supabase
             .from("threekend_sessions")
-            .select("id,public_code,mode,status,fixture_count,match_minutes,session_window_minutes,schedule_version,current_fixture_number,clock_state,clock_remaining_seconds,clock_run_started_at,started_at,hard_ends_at,version")
+            .select("id,public_code,mode,status,fixture_count,match_minutes,session_window_minutes,schedule_version,current_fixture_number,clock_state,clock_remaining_seconds,clock_run_started_at,started_at,hard_ends_at,updated_at,version")
             .eq("public_code", publicCode)
             .maybeSingle();
 
@@ -46,7 +48,7 @@ export async function GET(_request: Request, context: { params: Promise<{ code: 
 
         const { data: teamData, error: teamsError } = await supabase
             .from("threekend_teams")
-            .select("team_key,label,bib_code,color_hex,kit_type")
+            .select("team_key,label,bib_code,color_hex,kit_type,kit_opacity")
             .eq("session_id", session.id)
             .order("team_key");
 
@@ -60,35 +62,83 @@ export async function GET(_request: Request, context: { params: Promise<{ code: 
             color: team.color_hex,
             bibCode: team.bib_code,
             kitType: team.kit_type,
+            opacity: team.kit_opacity,
         })) as unknown as [RotationTeam, RotationTeam, RotationTeam];
         const fixtures = generateClassicRotation(teams, session.fixture_count);
         const now = Date.now();
-        const hardEnded = session.hard_ends_at ? now >= Date.parse(session.hard_ends_at) : false;
         const runStartedAt = session.clock_run_started_at ? Date.parse(session.clock_run_started_at) : null;
         const elapsedSeconds = session.clock_state === "running" && runStartedAt !== null
             ? Math.max(0, Math.floor((now - runStartedAt) / 1000))
             : 0;
         const sessionCompleted = session.status === "completed" || session.status === "cancelled";
-        const remainingSeconds = hardEnded || sessionCompleted || !currentFixtureNumberIsValid(session)
+        const remainingSeconds = !currentFixtureNumberIsValid(session)
             ? 0
-            : Math.max(0, session.clock_remaining_seconds - elapsedSeconds);
+            : sessionCompleted
+                ? session.clock_remaining_seconds
+                : Math.max(0, session.clock_remaining_seconds - elapsedSeconds);
+        const matchOvertimeSeconds = session.clock_state === "running" && runStartedAt !== null
+            ? Math.max(0, elapsedSeconds - session.clock_remaining_seconds)
+            : 0;
         const currentFixture = fixtures[session.current_fixture_number - 1] ?? null;
+        let activeTimekeeper: { name: string } | null = null;
+        if (currentFixture && (session.status === "waiting" || session.status === "live")) {
+            const { data: invites, error: invitesError } = await supabase
+                .from("threekend_invites")
+                .select("invitee_name,role,team_key")
+                .eq("session_id", session.id)
+                .eq("status", "accepted")
+                .is("revoked_at", null)
+                .gt("expires_at", new Date(now).toISOString());
+            if (invitesError) throw invitesError;
+
+            const restingTeamKey = currentFixture.restingTeams[0]?.id;
+            const assignedInvite = invites?.find((invite) =>
+                invite.role === "team_timekeeper" && invite.team_key === restingTeamKey
+            ) ?? invites?.find((invite) => invite.role === "session_timekeeper");
+            if (assignedInvite && (assignedInvite.role === "team_timekeeper" || assignedInvite.role === "session_timekeeper")) {
+                activeTimekeeper = { name: assignedInvite.invitee_name };
+            }
+        }
+        let stoppageType: "injury" | "normal" | null = null;
+        if (session.status === "live" && session.clock_state === "stopped") {
+            const { data: lastPause, error: pauseError } = await supabase
+                .from("threekend_session_events")
+                .select("details")
+                .eq("session_id", session.id)
+                .eq("fixture_number", session.current_fixture_number)
+                .eq("event_type", "match_paused")
+                .order("created_at", { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            if (pauseError) throw pauseError;
+            const details = lastPause?.details;
+            const recordedType = details && typeof details === "object" && !Array.isArray(details)
+                ? (details as Record<string, unknown>).stoppage_type
+                : null;
+            if (recordedType === "injury" || recordedType === "normal") {
+                stoppageType = recordedType;
+            }
+        }
 
         return noStoreJson({
             session: {
                 code: session.public_code,
                 mode: session.mode,
-                status: hardEnded ? "completed" : session.status,
+                status: session.status,
                 fixtureCount: session.fixture_count,
                 matchMinutes: session.match_minutes,
                 sessionWindowMinutes: session.session_window_minutes,
                 plannedPlayMinutes: session.fixture_count * session.match_minutes,
                 plannedBufferMinutes: session.session_window_minutes - session.fixture_count * session.match_minutes,
                 currentFixtureNumber: session.current_fixture_number,
-                clockState: hardEnded || sessionCompleted ? "stopped" : session.clock_state,
+                clockState: sessionCompleted ? "stopped" : session.clock_state,
                 remainingSeconds,
+                matchOvertimeSeconds,
+                stoppageType,
                 startedAt: session.started_at,
-                hardEndsAt: session.hard_ends_at,
+                stoppedAt: session.status === "live" && session.clock_state === "stopped" ? session.updated_at : null,
+                plannedEndsAt: session.hard_ends_at,
+                endedAt: sessionCompleted ? session.updated_at : null,
                 version: session.version,
             },
             teams,
@@ -105,6 +155,7 @@ export async function GET(_request: Request, context: { params: Promise<{ code: 
                 away: currentFixture.away,
                 restingTeams: currentFixture.restingTeams,
             } : null,
+            activeTimekeeper,
             serverNow: new Date(now).toISOString(),
         });
     } catch {

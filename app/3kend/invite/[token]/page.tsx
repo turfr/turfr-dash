@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { InviteAccept } from "../../InviteAccept";
 
 export const metadata: Metadata = {
-    title: "Accept 3Kend Timekeeper Invite | Turfr",
+    title: "Accept 3kend Timekeeper Invite | Turfr",
     robots: { index: false, follow: false },
 };
 

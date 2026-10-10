@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import styles from "./setup.module.css";
+import { TeamKitIcon } from "../TeamKitIcon";
+import { KIT_COLOR_PRESETS } from "@/lib/3kend/kit-colors";
 
 type TeamSetup = {
     key: "A" | "B" | "C";
@@ -11,6 +13,7 @@ type TeamSetup = {
     bibCode: string;
     colorHex: string;
     kitType: "jersey" | "bibs";
+    bibTransparency: number;
 };
 
 type SessionCreated = {
@@ -41,16 +44,19 @@ type InviteLink = {
 };
 
 const initialTeams: TeamSetup[] = [
-    { key: "A", label: "A", bibCode: "Black", colorHex: "#777b80", kitType: "bibs" },
-    { key: "B", label: "B", bibCode: "White", colorHex: "#f2f3eb", kitType: "bibs" },
-    { key: "C", label: "C", bibCode: "Orange", colorHex: "#ff8538", kitType: "bibs" },
+    { key: "A", label: "A", bibCode: "Black", colorHex: "#777b80", kitType: "bibs", bibTransparency: 20 },
+    { key: "B", label: "B", bibCode: "White", colorHex: "#f2f3eb", kitType: "bibs", bibTransparency: 20 },
+    { key: "C", label: "C", bibCode: "Orange", colorHex: "#ff8538", kitType: "bibs", bibTransparency: 20 },
 ];
+
+const DEFAULT_BIB_TRANSPARENCY = 20;
 
 export function AdminSetup() {
     const [checking, setChecking] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [recoveryKey, setRecoveryKey] = useState("");
     const [teams, setTeams] = useState(initialTeams);
+    const [customColorTeams, setCustomColorTeams] = useState<Record<string, boolean>>({});
     const [fixtureCount, setFixtureCount] = useState(12);
     const [matchMinutes, setMatchMinutes] = useState(8);
     const [sessionWindowMinutes, setSessionWindowMinutes] = useState(120);
@@ -116,6 +122,7 @@ export function AdminSetup() {
                     sessionWindowMinutes,
                     teams: teams.map((team) => ({
                         ...team,
+                        kitOpacity: team.kitType === "bibs" ? 1 - (team.bibTransparency ?? DEFAULT_BIB_TRANSPARENCY) / 100 : 1,
                         kitType: team.kitType === "jersey" ? "jersey" : "bibs",
                     })),
                 }),
@@ -305,14 +312,19 @@ export function AdminSetup() {
                             <div className={styles.teamList}>
                                 {teams.map((team) => (
                                     <div className={styles.teamRow} key={team.key}>
-                                        <strong style={{ "--team-color": team.colorHex } as React.CSSProperties}>{team.label}</strong>
+                                        <div className={styles.teamPreview} style={{ "--team-color": team.colorHex } as React.CSSProperties}>
+                                            <span>TEAM {team.key}</span>
+                                            <TeamKitIcon className={styles.teamPreviewKit} size={42} teamKey={team.key} label={team.label}
+                                                color={team.colorHex} kitType={team.kitType} bibCode={team.bibCode}
+                                                opacity={team.kitType === "bibs" ? 1 - (team.bibTransparency ?? DEFAULT_BIB_TRANSPARENCY) / 100 : 1} />
+                                        </div>
                                         <label className={styles.field}>
                                             <span>Team label</span>
                                             <input className={styles.input} value={team.label} maxLength={40} required
                                                 onChange={(event) => updateTeam(team.key, { label: event.target.value })} />
                                         </label>
                                         <label className={styles.field}>
-                                            <span>Kit color or code</span>
+                                            <span>Kit code</span>
                                             <input className={styles.input} value={team.bibCode} maxLength={40} required
                                                 onChange={(event) => updateTeam(team.key, { bibCode: event.target.value })} />
                                         </label>
@@ -325,10 +337,37 @@ export function AdminSetup() {
                                             </select>
                                         </label>
                                         <label className={styles.colorField}>
-                                            <span>Display color</span>
-                                            <input type="color" value={team.colorHex} aria-label={`Team ${team.key} display color`}
-                                                onChange={(event) => updateTeam(team.key, { colorHex: event.target.value })} />
+                                            <span>Kit colour</span>
+                                            <div className={styles.colorControls}>
+                                                <select className={styles.input} value={customColorTeams[team.key] ? "custom" : KIT_COLOR_PRESETS.find((preset) => preset.value.toLowerCase() === team.colorHex.toLowerCase())?.value ?? "custom"}
+                                                    aria-label={`Team ${team.key} kit colour`}
+                                                    onChange={(event) => {
+                                                        const preset = KIT_COLOR_PRESETS.find((item) => item.value === event.target.value);
+                                                        if (preset) {
+                                                            updateTeam(team.key, { colorHex: preset.value });
+                                                            setCustomColorTeams((current) => ({ ...current, [team.key]: false }));
+                                                        } else {
+                                                            setCustomColorTeams((current) => ({ ...current, [team.key]: true }));
+                                                        }
+                                                    }}>
+                                                    {KIT_COLOR_PRESETS.map((preset) => <option key={preset.value} value={preset.value}>{preset.name}</option>)}
+                                                    <option value="custom">Custom…</option>
+                                                </select>
+                                                {(customColorTeams[team.key] || !KIT_COLOR_PRESETS.some((preset) => preset.value.toLowerCase() === team.colorHex.toLowerCase())) && (
+                                                    <input type="color" value={team.colorHex} aria-label={`Choose custom colour for Team ${team.key}`}
+                                                        onChange={(event) => updateTeam(team.key, { colorHex: event.target.value })} />
+                                                )}
+                                            </div>
                                         </label>
+                                        {team.kitType === "bibs" && (
+                                            <label className={`${styles.field} ${styles.transparencyField}`}>
+                                                <span>Bib transparency <output>{team.bibTransparency ?? DEFAULT_BIB_TRANSPARENCY}%</output></span>
+                                                <input className={styles.rangeInput} type="range" min={0} max={60} step={5}
+                                                    value={team.bibTransparency ?? DEFAULT_BIB_TRANSPARENCY}
+                                                    aria-label={`Team ${team.key} bib transparency`}
+                                                    onChange={(event) => updateTeam(team.key, { bibTransparency: Number(event.target.value) })} />
+                                            </label>
+                                        )}
                                     </div>
                                 ))}
                             </div>
